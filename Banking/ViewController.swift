@@ -9,7 +9,33 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    let scrollView = UIScrollView()
+    
     let creditCard = CreditCard()
+    
+    var pickerViewExpiry = PickerViewExpiry()
+
+    
+    let buttonStackView: UIStackView = {
+        
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.distribution = .fillEqually
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.spacing = 30
+        
+        for i in 1...4{
+           let button = UIButton()
+            let image = UIImage(named: "creditCardFront\(i)")
+            button.tag = i
+            button.setBackgroundImage(image, for: .normal)
+            button.clipsToBounds = true
+            button.layer.cornerRadius = 25
+            button.addTarget(self, action: #selector(creditCardThemeTapped), for: .touchUpInside)
+            stackView.addArrangedSubview(button)
+        }
+        return stackView
+    }()
     
     var imageView: UIImageView = {
         let imageView = UIImageView(frame: .zero)
@@ -19,7 +45,7 @@ class ViewController: UIViewController {
         return imageView
     }()
     
-    let fullNameTextField: UITextField = {
+    lazy var fullNameTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.attributedPlaceholder = NSAttributedString(string: "Full Name", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
@@ -28,11 +54,10 @@ class ViewController: UIViewController {
         textField.layer.cornerRadius = 10
         textField.layer.sublayerTransform = CATransform3DMakeTranslation(20, 0, 0)
         textField.textContentType = .name
-        textField.addTarget(self, action: #selector(fullNameTextFieldChanged), for: .editingChanged)
         return textField
     }()
     
-    let creditCardNumbersTextField: UITextField = {
+    lazy var creditCardNumbersTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.attributedPlaceholder = NSAttributedString(string: "Card Number", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
@@ -40,11 +65,10 @@ class ViewController: UIViewController {
         textField.backgroundColor = .white
         textField.layer.cornerRadius = 10
         textField.layer.sublayerTransform = CATransform3DMakeTranslation(20, 0, 0)
-        textField.addTarget(self, action: #selector(cardNumberTextFieldChanged), for: .editingChanged)
         return textField
     }()
     
-    let expiryTextField: UITextField = {
+    lazy var expiryTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.attributedPlaceholder = NSAttributedString(string: "Expiry(MM/YY)", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
@@ -52,11 +76,11 @@ class ViewController: UIViewController {
         textField.backgroundColor = .white
         textField.layer.cornerRadius = 10
         textField.layer.sublayerTransform = CATransform3DMakeTranslation(20, 0, 0)
-        textField.addTarget(self, action: #selector(expiryTextFieldChanged), for: .editingChanged)
+        textField.addTarget(self, action: #selector(expiryTextFieldDidBegin), for: .editingDidBegin)
         return textField
     }()
     
-    let CVVTextField: UITextField = {
+    lazy var CVVTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.attributedPlaceholder = NSAttributedString(string: "CVV", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
@@ -64,71 +88,103 @@ class ViewController: UIViewController {
         textField.backgroundColor = .white
         textField.layer.cornerRadius = 10
         textField.layer.sublayerTransform = CATransform3DMakeTranslation(20, 0, 0)
-        textField.addTarget(self, action: #selector(CVVTextFieldChanged), for: .editingChanged)
         return textField
     }()
     
-    lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [expiryTextField, CVVTextField])
+    lazy var textFieldStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [fullNameTextField, creditCardNumbersTextField, expiryTextField, CVVTextField])
         stackView.axis = .horizontal
         stackView.distribution = .fillEqually
         stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.spacing = 10
+        stackView.spacing = 30
         return stackView
     }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.addSubview(imageView)
         view.backgroundColor = .systemBackground
+        CVVTextField.delegate = self
+        creditCardNumbersTextField.delegate = self
+        fullNameTextField.delegate = self
+        view.addSubview(imageView)
         view.addSubview(creditCard)
-        view.addSubview(fullNameTextField)
-        view.addSubview(creditCardNumbersTextField)
-        view.addSubview(stackView)
+        view.addSubview(buttonStackView)
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
+        view.addGestureRecognizer(tap)
+        
+        configureScrollView()
         addConstraints()
+        
+        pickerViewExpiry.delegate = self
     }
     
-    @objc func fullNameTextFieldChanged(){
-        creditCard.fullNameLabel.text = fullNameTextField.text
-    }
+
     
-    @objc func expiryTextFieldChanged(){
+    func configureScrollView(){
+        scrollView.contentSize = CGSize(width: textFieldStackView.frame.size.width, height: textFieldStackView.frame.size.height)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(scrollView)
+        //scrollView.backgroundColor = .red
+        scrollView.addSubview(textFieldStackView)
 
     }
     
-    @objc func CVVTextFieldChanged(){
-        //CVVTextField.text
+    @objc func expiryTextFieldDidBegin(){
+        let pickerView = UIPickerView()
+        pickerView.delegate = pickerViewExpiry
+        pickerView.dataSource = pickerViewExpiry
+        expiryTextField.inputView = pickerView
     }
     
-    @objc func cardNumberTextFieldChanged(){
-        //nao deixar passar de 16
-        //nao deixar entrar letras
-        
-        
-        if let numbers = creditCardNumbersTextField.text{
-            if let type = CreditCardTypeChecker.type(for: numbers){
-                let isValid = CreditCardTypeChecker.isValid(for: type, value: numbers)
-                creditCard.verifyFlag(type: type)
-            }
-            
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
+ 
+    
+    func validateCreditCard(){
+        if let type = CreditCardTypeChecker.type(for: creditCardNumbersTextField.text!){
+            let isValid = CreditCardTypeChecker.isValid(for: type, value: creditCardNumbersTextField.text!)
+            creditCard.verifyFlag(type: type)
+        }
+    }
+    
+    func editCreditCardNumbers(numbers: String){
             var result = String()
+            
             numbers.enumerated().forEach { (index, character) in
-                
-                // Add space every 4 characters
-                
                 if index % 4 == 0 && index > 0 {
                     result += "   "
                 }
                 result.append(character)
-
             }
 
             creditCard.numbersLabel.text = result
-
-        }
     }
+    
 
     func addConstraints(){
+        
+        let scrollViewConstraints = [
+            scrollView.topAnchor.constraint(equalTo: creditCard.bottomAnchor, constant: 40),
+            scrollView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.9),
+            scrollView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.1),
+            scrollView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ]
+        
+        NSLayoutConstraint.activate(scrollViewConstraints)
+        
+        let textFieldStackViewConstraints = [
+            textFieldStackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            textFieldStackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            textFieldStackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            textFieldStackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            textFieldStackView.heightAnchor.constraint(equalTo: scrollView.heightAnchor),
+            textFieldStackView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 3.0)
+        ]
+        
+        NSLayoutConstraint.activate(textFieldStackViewConstraints)
+        
         let creditCardConstraints = [
             creditCard.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.9),
             creditCard.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.3),
@@ -138,34 +194,6 @@ class ViewController: UIViewController {
         
         NSLayoutConstraint.activate(creditCardConstraints)
         
-        let fullNameConstraints = [
-            fullNameTextField.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.9),
-            fullNameTextField.heightAnchor.constraint(equalToConstant: 70),
-            fullNameTextField.topAnchor.constraint(equalTo: creditCard.bottomAnchor, constant: 20),
-            fullNameTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-        ]
-        
-        NSLayoutConstraint.activate(fullNameConstraints)
-        
-        let creditCardNumbersTextFieldConstraints = [
-            creditCardNumbersTextField.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.9),
-            creditCardNumbersTextField.heightAnchor.constraint(equalToConstant: 70),
-            creditCardNumbersTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            creditCardNumbersTextField.topAnchor.constraint(equalTo: fullNameTextField.bottomAnchor, constant: 20)
-        ]
-        
-        NSLayoutConstraint.activate(creditCardNumbersTextFieldConstraints)
-        
-        
-        let stackViewConstraints = [
-            stackView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.9),
-            stackView.heightAnchor.constraint(equalToConstant: 70),
-            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stackView.topAnchor.constraint(equalTo: creditCardNumbersTextField.bottomAnchor, constant: 20)
-        ]
-        
-        NSLayoutConstraint.activate(stackViewConstraints)
-        
         let imageViewConstraints = [
             imageView.topAnchor.constraint(equalTo: view.topAnchor),
             imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -174,7 +202,79 @@ class ViewController: UIViewController {
         ]
         
         NSLayoutConstraint.activate(imageViewConstraints)
+        
+        let buttonStackViewConstraints = [
+            buttonStackView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.9),
+            buttonStackView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.08),
+            buttonStackView.topAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: 40),
+            buttonStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ]
 
+        NSLayoutConstraint.activate(buttonStackViewConstraints)
     }
 
+}
+
+extension ViewController: PickerViewExpirySelected{
+    func expirySelected(month: String, year: String) {
+        let expiryYear = year.suffix(2)
+        expiryTextField.text = "\(month)/\(expiryYear)"
+        creditCard.validDateLabel.text = "\(month)/\(expiryYear)"
+    }
+}
+
+extension ViewController: UITextFieldDelegate{
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        
+        let currentText = textField.text ?? ""
+
+        guard let stringRange = Range(range, in: currentText) else { return false }
+        let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
+            
+        if textField == creditCardNumbersTextField || textField == CVVTextField{
+            guard CharacterSet(charactersIn: "0123456789").isSuperset(of: CharacterSet(charactersIn: string)) else {return false}
+        }
+        
+        switch textField {
+        case creditCardNumbersTextField:
+            let isCreditCardNumbers = updatedText.count <= 16
+            if isCreditCardNumbers{
+                editCreditCardNumbers(numbers: updatedText)
+            }
+            return isCreditCardNumbers
+        case fullNameTextField:
+            creditCard.fullNameLabel.text = fullNameTextField.text
+            return true
+        default:
+            creditCard.flipToBack()
+            
+            let isCVV = updatedText.count <= 3
+            if isCVV{
+                creditCard.CVVLabel.text = updatedText
+            }
+            return isCVV
+        }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.view.endEditing(true)
+    }
+
+}
+
+extension ViewController{
+    @objc func creditCardThemeTapped(sender: UIButton){
+        buttonStackView.arrangedSubviews.forEach({ button in
+        UIView.transition(with: creditCard.creditCardFrontimageView,
+              duration: 0.50,
+              options: .transitionCrossDissolve,
+              animations: { self.creditCard.creditCardFrontimageView.image = UIImage(named: "creditCardFront\(sender.tag)") },
+              completion: nil)
+        UIView.transition(with: creditCard.creditCardBackimageView,
+              duration: 0.50,
+              options: .transitionCrossDissolve,
+              animations: { self.creditCard.creditCardBackimageView.image = UIImage(named: "creditCardBack\(sender.tag)") },
+              completion: nil)
+        })
+    }
 }
