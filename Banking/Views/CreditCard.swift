@@ -117,6 +117,12 @@ class CreditCard: UIView{
         let tap = UITapGestureRecognizer(target: self, action: #selector(flipCard))
         self.addGestureRecognizer(tap)
         
+        self.layer.shadowColor = UIColor.systemRed.cgColor
+        self.layer.shadowOffset = CGSize(width: 2,
+                                         height: 10)
+        self.layer.shadowRadius = 20
+        self.layer.shadowOpacity = 0.5
+
         
         addSubview(creditCardBack)
         addSubview(creditCardFront)

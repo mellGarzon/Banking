@@ -36,14 +36,7 @@ class ViewController: UIViewController {
         }
         return stackView
     }()
-    
-    var imageView: UIImageView = {
-        let imageView = UIImageView(frame: .zero)
-        imageView.image = UIImage(named: "background")
-        imageView.contentMode = .scaleToFill
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
-    }()
+
     
     lazy var fullNameTextField: UITextField = {
         let textField = UITextField()
@@ -106,7 +99,6 @@ class ViewController: UIViewController {
         CVVTextField.delegate = self
         creditCardNumbersTextField.delegate = self
         fullNameTextField.delegate = self
-        view.addSubview(imageView)
         view.addSubview(creditCard)
         view.addSubview(buttonStackView)
         
@@ -125,7 +117,6 @@ class ViewController: UIViewController {
         scrollView.contentSize = CGSize(width: textFieldStackView.frame.size.width, height: textFieldStackView.frame.size.height)
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(scrollView)
-        //scrollView.backgroundColor = .red
         scrollView.addSubview(textFieldStackView)
 
     }
@@ -193,15 +184,7 @@ class ViewController: UIViewController {
         ]
         
         NSLayoutConstraint.activate(creditCardConstraints)
-        
-        let imageViewConstraints = [
-            imageView.topAnchor.constraint(equalTo: view.topAnchor),
-            imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            imageView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ]
-        
-        NSLayoutConstraint.activate(imageViewConstraints)
+
         
         let buttonStackViewConstraints = [
             buttonStackView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.9),
@@ -263,15 +246,31 @@ extension ViewController: UITextFieldDelegate{
 }
 
 extension ViewController{
+    
     @objc func creditCardThemeTapped(sender: UIButton){
+        var shadowColor: CGColor?
+        
+        switch sender.tag {
+        case 1:
+            shadowColor = UIColor.systemRed.cgColor
+        case 2:
+            shadowColor = UIColor.black.cgColor
+        case 3:
+            shadowColor = UIColor.systemBlue.cgColor
+        case 4:
+            shadowColor = UIColor.systemPink.cgColor
+        default:
+            print("Choose a valid credit card")
+        }
+        
         buttonStackView.arrangedSubviews.forEach({ button in
         UIView.transition(with: creditCard.creditCardFrontimageView,
-              duration: 0.50,
+              duration: 0.70,
               options: .transitionCrossDissolve,
-              animations: { self.creditCard.creditCardFrontimageView.image = UIImage(named: "creditCardFront\(sender.tag)") },
+                          animations: { self.creditCard.creditCardFrontimageView.image = UIImage(named: "creditCardFront\(sender.tag)"); self.creditCard.layer.shadowColor = shadowColor},
               completion: nil)
         UIView.transition(with: creditCard.creditCardBackimageView,
-              duration: 0.50,
+              duration: 0.70,
               options: .transitionCrossDissolve,
               animations: { self.creditCard.creditCardBackimageView.image = UIImage(named: "creditCardBack\(sender.tag)") },
               completion: nil)

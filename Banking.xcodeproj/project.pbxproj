@@ -17,6 +17,7 @@
 		9C84AF6D2880C3FE00AC0633 /* CreditCardTypeChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C84AF6C2880C3FE00AC0633 /* CreditCardTypeChecker.swift */; };
 		9CC110D428820B41008A7A32 /* PickerViewExpiry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CC110D328820B41008A7A32 /* PickerViewExpiry.swift */; };
 		9CE0FF6A288617D800CC2E75 /* TransactionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CE0FF69288617D800CC2E75 /* TransactionViewController.swift */; };
+		9CE0FF6C2886986700CC2E75 /* TransactionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CE0FF6B2886986700CC2E75 /* TransactionTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		9C84AF6C2880C3FE00AC0633 /* CreditCardTypeChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditCardTypeChecker.swift; sourceTree = "<group>"; };
 		9CC110D328820B41008A7A32 /* PickerViewExpiry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerViewExpiry.swift; sourceTree = "<group>"; };
 		9CE0FF69288617D800CC2E75 /* TransactionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionViewController.swift; sourceTree = "<group>"; };
+		9CE0FF6B2886986700CC2E75 /* TransactionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,11 +66,12 @@
 		9C84AF51287DB7A100AC0633 /* Banking */ = {
 			isa = PBXGroup;
 			children = (
+				9CE0FF6F28873D1100CC2E75 /* ViewControllers */,
+				9CE0FF6E28873D0800CC2E75 /* Models */,
+				9CE0FF6D28873CF600CC2E75 /* ViewModels */,
 				9C84AF66287DB7C900AC0633 /* Views */,
 				9C84AF52287DB7A100AC0633 /* AppDelegate.swift */,
 				9C84AF54287DB7A100AC0633 /* SceneDelegate.swift */,
-				9CE0FF69288617D800CC2E75 /* TransactionViewController.swift */,
-				9C84AF56287DB7A100AC0633 /* ViewController.swift */,
 				9C84AF6C2880C3FE00AC0633 /* CreditCardTypeChecker.swift */,
 				9C84AF58287DB7A100AC0633 /* Main.storyboard */,
 				9C84AF5B287DB7A400AC0633 /* Assets.xcassets */,
@@ -81,10 +84,34 @@
 		9C84AF66287DB7C900AC0633 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				9CE0FF6B2886986700CC2E75 /* TransactionTableViewCell.swift */,
 				9C84AF67287DB81300AC0633 /* CreditCard.swift */,
 				9CC110D328820B41008A7A32 /* PickerViewExpiry.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		9CE0FF6D28873CF600CC2E75 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		9CE0FF6E28873D0800CC2E75 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		9CE0FF6F28873D1100CC2E75 /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				9C84AF56287DB7A100AC0633 /* ViewController.swift */,
+				9CE0FF69288617D800CC2E75 /* TransactionViewController.swift */,
+			);
+			path = ViewControllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -160,6 +187,7 @@
 			files = (
 				9C84AF68287DB81300AC0633 /* CreditCard.swift in Sources */,
 				9CE0FF6A288617D800CC2E75 /* TransactionViewController.swift in Sources */,
+				9CE0FF6C2886986700CC2E75 /* TransactionTableViewCell.swift in Sources */,
 				9C84AF57287DB7A100AC0633 /* ViewController.swift in Sources */,
 				9CC110D428820B41008A7A32 /* PickerViewExpiry.swift in Sources */,
 				9C84AF53287DB7A100AC0633 /* AppDelegate.swift in Sources */,
